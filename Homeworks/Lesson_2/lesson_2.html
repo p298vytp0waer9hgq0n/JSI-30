@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <header></header>
+  <main id="target" class="target" name="target"></main>
+  <article></article>
+  <footer></footer>
+  <script>
+    /*
+     Необходимо найти и записать в переменную узел-элемент <main></main> всеми возможными способами
+
+     Например : 
+
+     const main1 = "Ваш код"
+     console.log('main1', main1);  // output: "main1" <main id="target" class="target" name="target"></main>
+
+     const main2 = ...
+     console.log('main2', main2);  // output: "main2" <main id="target" class="target" name="target"></main>
+
+     и т. д.
+
+     Важно : Если решаем идти по узлам с корня документа, то идем только по кратчайшему пути
+    */
+
+    // === Метод раз. Используя методы семейсва getElementsBy*(). ===
+    let main1 = document.getElementsByTagName('main')[0];
+    console.log('ElementsBy*', main1);
+
+    main1 = document.getElementById('target');
+    console.log('ElementsBy*', main1);
+
+    main1 = document.getElementsByClassName('target')[0];
+    console.log('ElementsBy*', main1);
+
+    main1 = document.getElementsByName('target')[0];
+    console.log('ElementsBy*', main1);
+
+
+    // === Метод два. Используя метод querySelector()/querySelectorAll() со всякими разными css селекторами. ===
+    let main2 = document.querySelector('#target'); // с селектором по id
+    console.log('querySelector', main2);
+
+    main2 = document.querySelector('.target'); // с селектором по классу
+    console.log('querySelector', main2);
+
+    main2 = document.querySelector('main'); // с селектором по хтмл-тегу
+    console.log('querySelector', main2);
+
+    main2 = document.querySelector('*[name="target"]'); // с селектором по атрибуту (здесь name)
+    console.log('querySelector', main2);
+
+    // querySelectorAll() работает точно так же, но ищет все удовлетворяющие елементы вместо первого.
+    // Поэтому нужно брать первый елемент возвращаемой коллекции
+    main2 = document.querySelectorAll(':only-of-type:nth-child(2):not(body)')[0]; // с нелепым селектором
+    console.log('querySelector', main2);
+
+
+    // === Метод три. "Вручную". ===
+    // Так как DOM представляет собой древовидную структуру и положение
+    // искомого тега заранее неизвестно, то требование идти "по кратчайшему пути"
+    // вызывает недоумение. Так как сейчас три часа ночи, то вместо того чтобы
+    // уточнить условие, обход DOM выполним "в ширину". Создаём класс простой очереди.
+    class Queue {
+      constructor() {
+        this.storage = [];
+        this.start = 0;
+      }
+
+      get length() {
+        return this.storage.length - this.start;
+      }
+
+      enqueue(item) {
+        this.storage.push(item);
+      }
+
+      dequeue(item) {
+        return this.storage[this.start++];
+      }
+    }
+
+    // Функция поиска (например, по тегу, для определённости)
+    function domBreadthFirstTagSearch(tag) {
+      const domQueue = new Queue();
+      domQueue.enqueue(document.children);
+      while (domQueue.length > 0) {
+        const collection = domQueue.dequeue();
+        for (const element of collection) {
+          if (element.tagName === tag.toUpperCase()) {
+            return element;
+          }
+          if (element.children && element.children.length > 0) {
+            domQueue.enqueue(element.children);
+          }
+        }
+      }
+      return null;
+    }
+
+    console.log('manual search', domBreadthFirstTagSearch('main'));
+  </script>
+</body>
+
+</html>
